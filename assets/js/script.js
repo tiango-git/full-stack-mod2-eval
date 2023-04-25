@@ -3,17 +3,32 @@ $(document).ready(function () {
 
 
     var urlApi = "https://digimon-api.vercel.app/api/digimon";
-    var urlWiki = "http://en.wikipedia.org/wiki/";
-    var contenido = document.querySelector("#contenido")
+    var urlApiLevel = "https://digimon-api.vercel.app/api/digimon/level/";
+    var urlWiki = "https://digimon.fandom.com/es/wiki/";
+    var contenido = document.querySelector("#contenido");
 
-    // Selección de categoría
-    document.getElementById('selectFilm').addEventListener('change', selectFilm);
+    // Selección de nivel
+    document.getElementById('selectLevel').addEventListener('change', selectLevel);
 
-    function selectFilm() {
-        let movie = document.getElementById('selectFilm').value.toLowerCase();
-        urlApiMovie = urlApi + movie;
+    // Trae los pokemon por nivel
+    function selectLevel() {
+        //limpiar la pagina web
+        contenido.innerHTML = "";
+        // Obtener el nivel seleccionado
+        let level = document.getElementById('selectLevel').value.toLowerCase();
+        console.log(level);
+        //Traer pokemon
+        getLevel(level);
+        // Si el nivel es "In Training", también traer "Training"
+        if (level == "in training") {
+            getLevel("Training");
+        }
+    }
+
+    function getLevel(level) {
+        url = urlApiLevel + level;
         //console.log(url);
-        fetch(urlApiMovie)
+        fetch(url)
             // en la primera variable "response" queda el resultado del fetch
             .then(response => response.json())
             //en la segunda variable "datos" queda el resultado de la línea anterior
@@ -25,59 +40,69 @@ $(document).ready(function () {
             })
     }
 
+
+
+
+    // Muestra los Pokemon en la página
     function showPokemon(pokemon) {
         let urlWikiPoke = urlWiki + pokemon.name.split(" ").join("_");
-        let seleccion = document.getElementById('selectFilm').value.toLowerCase();
+        let strClick = "window.open('" + urlWikiPoke + "')";
 
 
-        contenido.innerHTML +=  `
-        <div class="tarjeta">
-        <div class="card" style="width: 18rem; ">
-        <img src="${pokemon.img}" class="card-img-top" alt="${pokemon.name}">
-        <div class="card-body">
-          <h5 class="card-title">${pokemon.name}</h5>
-          <p class="card-text">${pokemon.level}</p>
-          <a href="#" class="btn btn-primary">Go somewhere</a>
-        </div>
-        </div>
-        </div>
-        `
-        var urlWikiMovie = urlWiki + pokemon.name.split(" ").join("_");
-        //console.log(urlWikiMovie)
-        document.getElementById('botonInfo').setAttribute("onClick", "window.open('" + urlWikiMovie + "')");
+        //<div class="card d-inline-block m-2 " style="width: 18rem; ">
+        contenido.innerHTML += `
+            <div class="card d-inline-block col text-center"  onclick="onClickDiv(this)">
+                <div class="text-center">
+                    <img src="${pokemon.img}" class="card-img-top m-1" alt="${pokemon.name}" onmouseover="onInImagen(this)" onmouseout="onOutImagen(this)">
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title text-center">${pokemon.name}</h5>
+                    <p class="card-text">${pokemon.level}</p>
+                    <button type="button" class="btn btn-block btn-primary mt-3" id="botonInfo" onclick="${strClick}">Más
+                        información</button>
+                </div>
+            </div>
+        `;
     }
 
 
 
-//////////////////////////
-var url = "https://digimon-api.vercel.app/api/digimon" 
-var contenido = document.querySelector("#contenido")
+    // Trae todos los Pokemon
+    fetch(urlApi)
+        .then(response => response.json())
+        .then(datos => {
+            for (item of datos) {
+                showPokemon(item);
+            }
+        })
 
-fetch(url)
-.then(response => response.json())
-.then(datos => {
-    for (item of datos) {
-        
-            contenido.innerHTML +=  `
-            <div class="tarjeta">
-            <div class="card" style="width: 18rem; ">
-            <img src="${item.img}" class="card-img-top" alt="${item.name}">
-            <div class="card-body">
-              <h5 class="card-title">${item.name}</h5>
-              <p class="card-text">${item.level}</p>
-              <a href="#" class="btn btn-primary">Go somewhere</a>
-            </div>
-            </div>
-            </div>
-            `
-            if (item.id == 3) {break;}
-        }
-    
-})
+
 
 
 
 });
 
+//Imagen
+function onInImagen(element) {
+    //console.log(element);
+    //element.style.width = "100%";
+    //element.style.filter = "grayscale(0%)";
+    element.style.transform = "scaleX(-1)";
 
+}
 
+function onOutImagen(element) {
+    //element.style.width = "80%";
+    //element.style.filter = "grayscale(100%)";
+    element.style.transform = "scaleX(1)";
+}
+
+function onClickDiv(element) {
+    if(!element.dataset.clicked){
+        element.setAttribute("data-clicked", "true");
+        element.style.backgroundColor = "green";
+     }else{
+        element.removeAttribute("data-clicked");
+        element.style.backgroundColor = "";
+     }
+}

@@ -1,4 +1,15 @@
-.tarjeta {
-    margin: 2%;
-    display: inline-block;
+.navbar {
+    background-color: #6f42c1;
 }
+
+.logo {
+    width: 10%;
+
+}
+
+.card-img-top {
+    max-width: 100%;
+    height: auto;
+  
+}
+  
